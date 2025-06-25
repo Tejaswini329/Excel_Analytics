@@ -209,12 +209,7 @@ body {
   font-size: 1.1em;
   vertical-align: middle;
 }
-/* App.css */
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f5f7fa;
-}
+
 
 h1 {
   text-align: center;
@@ -222,7 +217,7 @@ h1 {
   color: #333;
 }
 
-/* App.css */
+
 nav.navbar {
   background-color: #007bff;
   padding: 12px 24px;
