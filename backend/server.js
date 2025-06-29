@@ -1,45 +1,41 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const app = express();
 const cors = require('cors');
+const bodyParser = require('body-parser');
 
+const app = express();
 
-// MongoDB Atlas Connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('MongoDB Atlas connected directly!'))
-.catch(err => console.error('Connection error:', err));
+// ✅ MongoDB Connection
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ MongoDB Atlas connected!'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
 
-
-// Middleware, Routes, etc...
-app.use(express.json());
-
-// Sirf frontend origin allow karna hai (secure tarika)
+// ✅ Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Vite ka default port
+  origin: 'http://localhost:5173',
   credentials: true
 }));
+app.use(express.json({ limit: '10mb' }));
+app.use(bodyParser.json({ limit: '10mb' }));
 
-// Ya development ke liye sab origin allow karna hai toh (simple tarika)
-app.use(cors());
-
-
-// Routes (Yeh wala step)
+// ✅ Routes
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
 const protectedRoutes = require('./routes/protectedRoutes');
-app.use('/api', protectedRoutes); // /api/dashboard
+app.use('/api', protectedRoutes); // Handles routes like /api/dashboard
 
+const uploadExcelRoutes = require('./routes/uploadExcel');
+app.use('/api/excel', uploadExcelRoutes); // ✅ This adds: POST /api/excel/upload
 
-
-// Example route
+// ✅ Health Check Route
 app.get('/', (req, res) => {
-  res.send('Direct connection works!');
+  res.send('🚀 Server is running and MongoDB is connected!');
 });
 
+// ✅ Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
