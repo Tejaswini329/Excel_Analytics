@@ -1,29 +1,41 @@
-// ParseExcel.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import './ParseExcel.css';
 
 const ParseExcel = () => {
   const location = useLocation();
-  const data = location.state?.data || [];
+  const data = location.state?.data;
+
+  // ✅ Log once after render
+  useEffect(() => {
+    console.log("Parsed Data:", data);
+  }, [data]);
+
+  // ✅ Handle empty or invalid data
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return <div>No data found. Please upload again.</div>;
+  }
 
   return (
-    <div className="parsed-table-container">
-      <h2 className="parsed-heading">Parsed Excel Data</h2>
-      <div className="parsed-table-wrapper">
-        <table className="parsed-table">
+    <div className="parse-container">
+      <h2>Parsed Excel Data</h2>
+      <div className="table-wrapper">
+        <table className="data-table">
+          <thead>
+            <tr>
+              {data[0].map((header, idx) => (
+                <th key={idx}>{header}</th>
+              ))}
+            </tr>
+          </thead>
           <tbody>
-            {data.length === 0 ? (
-              <tr><td>No data to display.</td></tr>
-            ) : (
-              data.map((row, i) => (
-                <tr key={i}>
-                  {row.map((cell, j) => (
-                    <td key={j}>{cell}</td>
-                  ))}
-                </tr>
-              ))
-            )}
+            {data.slice(1).map((row, i) => (
+              <tr key={i}>
+                {row.map((cell, j) => (
+                  <td key={j}>{cell}</td>
+                ))}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
