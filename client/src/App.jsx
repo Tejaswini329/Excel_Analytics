@@ -4,11 +4,12 @@ import viteLogo from '/vite.svg'
 
 import React from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import Register from './components/Register';
-import Login from './components/Login';
-import UploadExcel from './components/UploadExcel';
-import ParseExcel from './components/ParseExcel';
-import WelcomePage from './components/WelcomePage';
+import Register from './pages/Register';
+import Login from './pages/Login';
+import UploadExcel from './pages/UploadExcel';
+import ParseExcel from './pages/ParseExcel';
+import WelcomePage from './pages/WelcomePage';
+import Chart from './pages/Chart';
 import './App.css';
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/upload" element={<UploadExcel />} />
         <Route path="/parse" element={<ParseExcel />} />
+         <Route path="/chart" element={<Chart />} />
         <Route path="*" element={<div>404 - Page Not Found</div>} />
       </Routes>
     </div>
