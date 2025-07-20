@@ -1,8 +1,13 @@
 const mongoose = require('mongoose');
 
 const excelDataSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   rows: {
-    type: [mongoose.Schema.Types.Mixed], // Accepts array of any shape
+    type: [mongoose.Schema.Types.Mixed],
     required: true
   },
   uploadedAt: {
@@ -12,4 +17,3 @@ const excelDataSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('ExcelData', excelDataSchema);
-

@@ -29,6 +29,13 @@ app.use('/api', protectedRoutes); // Handles routes like /api/dashboard
 const uploadExcelRoutes = require('./routes/uploadExcel');
 app.use('/api/excel', uploadExcelRoutes); // ✅ This adds: POST /api/excel/upload
 
+const chartRoutes = require('./routes/ChartHistory');
+app.use('/api', chartRoutes); 
+
+
+const uploadhistory = require('./routes/History');
+app.use('/api',uploadhistory);
+
 // ✅ Health Check Route
 app.get('/', (req, res) => {
   res.send('🚀 Server is running and MongoDB is connected!');

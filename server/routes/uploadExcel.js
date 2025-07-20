@@ -12,11 +12,11 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // ✅ Convert buffer to JSON
+    const userId = req.body.userId;
     const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    const parsedData = XLSX.utils.sheet_to_json(worksheet); // <-- KEY POINT
+    const parsedData = XLSX.utils.sheet_to_json(worksheet);
 
     console.log("✅ Parsed JSON:", parsedData);
 
@@ -24,17 +24,23 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'Excel content is empty or invalid' });
     }
 
-    // ✅ Save to MongoDB
-    const result = await ExcelData.create({
-      rows: parsedData,
-      uploadedAt: new Date()
-    });
+    try {
+      const result = await ExcelData.create({
+        userId,
+        rows: parsedData,
+        uploadedAt: new Date()
+      });
+      res.status(200).json({ message: 'Uploaded and saved!', id: result._id });
+    } catch (err) {
+      console.error('❌ DB Save Error:', err.message);
+      res.status(500).json({ error: 'Database Error' });
+    }
 
-    res.status(200).json({ message: 'Uploaded and saved!', id: result._id });
   } catch (err) {
     console.error('❌ Upload failed:', err.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 module.exports = router;

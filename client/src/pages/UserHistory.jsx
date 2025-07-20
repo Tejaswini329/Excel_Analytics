@@ -1,4 +1,3 @@
-// UploadExcel.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
@@ -9,8 +8,6 @@ const UploadExcel = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-  
-
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -19,10 +16,15 @@ const UploadExcel = () => {
   const handleUploadAndView = async () => {
     if (!file) return setMessage('Please select a file first.');
 
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      setMessage('User not logged in. Please log in first.');
+      return;
+    }
+
     try {
       const reader = new FileReader();
       reader.onload = async (e) => {
-        
         const binaryStr = e.target.result;
         const workbook = XLSX.read(binaryStr, { type: 'binary' });
         const sheetName = workbook.SheetNames[0];
@@ -31,34 +33,28 @@ const UploadExcel = () => {
 
 
         // 1. Send to MongoDB via backend
-        const userId = localStorage.getItem('userId'); 
-if (!userId) {
-  setMessage('User ID missing. Please log in first.');
-  return;
-}
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('userId', userId); // ✅ just the string
 
-const formData = new FormData();
-formData.append('file', file);
-formData.append('userId', userId); // just the string
-
-
-
-           await axios.post('http://localhost:5000/api/excel/upload', formData, {
-             headers: { 'Content-Type': 'multipart/form-data' }
- });
-
-
-
+        try {
+          await axios.post('http://localhost:5000/api/excel/upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+        } catch (uploadErr) {
+          console.error('Upload error:', uploadErr);
+          setMessage('Error uploading to backend.');
+          return;
+        }
 
         // 2. Navigate to parse page
-       navigate('/parse', { state: { data: jsonData, fileName: file.name } });
-
+        navigate('/parse', { state: { data: jsonData } });
       };
 
       reader.readAsBinaryString(file);
     } catch (err) {
-      console.error(err);
-      setMessage('Error uploading or parsing file.');
+      console.error('Parsing error:', err);
+      setMessage('Error parsing Excel file.');
     }
   };
 

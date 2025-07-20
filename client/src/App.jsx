@@ -9,7 +9,9 @@ import Login from './pages/Login';
 import UploadExcel from './pages/UploadExcel';
 import ParseExcel from './pages/ParseExcel';
 import WelcomePage from './pages/WelcomePage';
-import Chart from './pages/Chart';
+import Chart from './pages/chart';
+import UserHistory from './pages/UserHistory';
+
 import './App.css';
 
 function App() {
@@ -23,25 +25,42 @@ function App() {
 
       {!hideNav && isLoggedIn && (
         <nav className="navbar">
-          <Link to="/upload">📤 Upload Excel</Link>
-          <button
-            style={{
-              marginLeft: "20px",
-              padding: "6px 14px",
-              backgroundColor: "#dc3545",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer"
-            }}
-            onClick={() => {
-              localStorage.removeItem('isLoggedIn');
-              window.location.href = '/'; // force refresh
-            }}
-          >
-            Logout
-          </button>
-        </nav>
+  <Link to="/upload">📤 Upload Excel</Link>
+
+  <Link
+    to="/user-history"
+    style={{
+      marginLeft: "20px",
+      padding: "6px 14px",
+      backgroundColor: "#007bff",
+      color: "#fff",
+      border: "none",
+      borderRadius: "5px",
+      textDecoration: "none"
+    }}
+  >
+    📚 View History
+  </Link>
+
+  <button
+    style={{
+      marginLeft: "20px",
+      padding: "6px 14px",
+      backgroundColor: "#dc3545",
+      color: "#fff",
+      border: "none",
+      borderRadius: "5px",
+      cursor: "pointer"
+    }}
+    onClick={() => {
+      localStorage.removeItem('isLoggedIn');
+      window.location.href = '/'; // force refresh
+    }}
+  >
+    Logout
+  </button>
+</nav>
+
       )}
 
       <Routes>
@@ -51,6 +70,7 @@ function App() {
         <Route path="/upload" element={<UploadExcel />} />
         <Route path="/parse" element={<ParseExcel />} />
          <Route path="/chart" element={<Chart />} />
+         <Route path="/user-history" element={<UserHistory />} />
         <Route path="*" element={<div>404 - Page Not Found</div>} />
       </Routes>
     </div>

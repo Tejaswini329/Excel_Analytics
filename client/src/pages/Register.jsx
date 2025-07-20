@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import {
   FaEnvelope,
   FaLock,
@@ -7,26 +8,50 @@ import {
   FaApple,
   FaTimes,
 } from "react-icons/fa";
-import "./Login.css"; // Reusing the same CSS file
+import "./Login.css";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
   const [form, setForm] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Registration logic here
-    alert("Registration successful!");
+    setError("");
+
+    if (form.password !== form.confirmPassword) {
+      return setError("Passwords do not match.");
+    }
+
+    try {
+  const res = await axios.post("http://localhost:5000/api/auth/register", {
+    username: form.username,
+    email: form.email,
+    password: form.password,
+  });
+
+  alert("✅ Registration successful!");
+  console.log("Registered User ID:", res.data.userId);
+  navigate("/login"); // Redirect to login page 🎯
+} catch (err) {
+  
+
+      console.error("Registration error:", err);
+      setError(
+        err.response?.data?.error || "❌ Server error during registration."
+      );
+    }
   };
 
   return (
@@ -40,16 +65,18 @@ function Register() {
           Already have an account? <a href="/login">Sign in</a>
         </p>
 
+        {error && <div className="error-text">{error}</div>}
+
         <div className="input-group">
           <FaUser className="input-icon" />
           <input
-            type="Username"
-            name="name"
-            placeholder="Usename"
-            value={form.name}
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={form.username}
             onChange={handleChange}
             required
-            autoComplete="name"
+            autoComplete="username"
           />
         </div>
 
@@ -69,62 +96,36 @@ function Register() {
         <div className="input-group">
           <FaLock className="input-icon" />
           <input
-            type="text"
+            type={showPassword ? "text" : "password"}
             name="password"
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
             required
-            autoComplete="current-password"
+            autoComplete="new-password"
           />
-          {/* <span
-                    className="toggle-password"
-                    onClick={() => setShowPassword((v) => !v)}
-                    title={showPassword ? "Hide Password" : "Show Password"}
-                  >
-                    {showPassword ? "🙈" : "👁️"}
-                  </span> */}
         </div>
 
         <div className="input-group">
           <FaLock className="input-icon" />
           <input
-            type="text"
-            name="password"
+            type={showPassword ? "text" : "password"}
+            name="confirmPassword"
             placeholder="Confirm Password"
-            value={form.password}
+            value={form.confirmPassword}
             onChange={handleChange}
             required
-            autoComplete="current-password"
+            autoComplete="new-password"
           />
-          {/* <span
-                    className="toggle-password"
-                    onClick={() => setShowPassword((v) => !v)}
-                    title={showPassword ? "Hide Password" : "Show Password"}
-                  >
-                    {showPassword ? "🙈" : "👁️"}
-                  </span> */}
         </div>
 
         <button type="submit" className="login-btn">
           Sign Up
         </button>
 
-        <div className="divider">
-          <span>OR</span>
-        </div>
+        
 
-        <div className="social-row">
-          <button type="button" className="social-btn apple">
-            <FaApple size={20} />
-          </button>
-          <button type="button" className="social-btn google">
-            <FaGoogle size={20} />
-          </button>
-          <button type="button" className="social-btn x">
-            <FaTimes size={20} />
-          </button>
-        </div>
+        
       </form>
     </div>
   );

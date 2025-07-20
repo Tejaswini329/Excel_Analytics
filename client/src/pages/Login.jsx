@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaApple, FaGoogle, FaTimes, FaEnvelope, FaLock } from "react-icons/fa";
 import "./Login.css";
+import axios from 'axios';
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -12,24 +13,26 @@ function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    // ✅ Simulate login success
-    if (form.email && form.password) {
-      localStorage.setItem('isLoggedIn', 'true');
-      navigate('/upload'); // redirect after login
-    } else {
-      alert("Please enter valid credentials");
-    }
-  };
+  try {
+    const res = await axios.post('http://localhost:5000/api/auth/login', form);
+    localStorage.setItem('userId', res.data.userId); // ✅ Save userId
+    localStorage.setItem('isLoggedIn', 'true');
+    navigate('/upload');
+  } catch (err) {
+    console.error('Login error:', err);
+    alert("Login failed: " + err.response?.data?.error || 'Server error');
+  }
+};
+
+
 
   return (
     <div className="login-bg">
       <form className="login-card" onSubmit={handleSubmit}>
-        <div className="login-logo">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg" alt="logo" />
-        </div>
+        
         <h2 className="login-title">Welcome Back</h2>
         <p className="login-subtitle">
           Don't have an account yet? <a href="/register">Sign up</a>
@@ -61,12 +64,8 @@ function Login() {
         <button type="submit" className="login-btn">
           Login
         </button>
-        <div className="divider"><span>OR</span></div>
-        <div className="social-row">
-          <button type="button" className="social-btn apple"><FaApple size={20} /></button>
-          <button type="button" className="social-btn google"><FaGoogle size={20} /></button>
-          <button type="button" className="social-btn x"><FaTimes size={20} /></button>
-        </div>
+        
+        
       </form>
     </div>
   );
