@@ -2,48 +2,18 @@
   padding: 2rem;
 }
 
-.history-title {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-  color: #333;
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.history-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
-}
-
-.history-card {
-  background: #f9f9f9;
+.history-table th,
+.history-table td {
   padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.history-card p {
-  margin: 0.5rem 0;
-  color: #444;
-}
-
-.history-buttons {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.download-btn {
-  padding: 8px 12px;
-  background-color: #007bff;
-  color: white;
+  border: 1px solid #ddd;
   text-align: center;
-  border-radius: 5px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
 }
 
-.download-btn:hover {
-  background-color: #0056b3;
+.history-table th {
+  background-color: #f0f0f0;
 }

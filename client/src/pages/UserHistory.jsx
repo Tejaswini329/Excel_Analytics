@@ -1,77 +1,85 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import * as XLSX from 'xlsx';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './UploadExcel.css';
 
-const UploadExcel = () => {
-  const [file, setFile] = useState(null);
-  const [message, setMessage] = useState('');
-  const navigate = useNavigate();
+const SERVER_BASE_URL = 'http://localhost:5000';
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
+const UserHistory = () => {
+  const [downloads, setDownloads] = useState([]);
 
-  const handleUploadAndView = async () => {
-    if (!file) return setMessage('Please select a file first.');
+  useEffect(() => {
+    const fetchDownloads = async () => {
+      try {
+        const res = await axios.get(`${SERVER_BASE_URL}/api/downloads`);
+        setDownloads(res.data);
+      } catch (err) {
+        console.error('Failed to fetch downloads:', err);
+      }
+    };
 
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      setMessage('User not logged in. Please log in first.');
-      return;
-    }
+    fetchDownloads();
+  }, []);
 
-    try {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const binaryStr = e.target.result;
-        const workbook = XLSX.read(binaryStr, { type: 'binary' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+  // Group PNG + PDF by file prefix (ID part before dash)
+  const grouped = downloads.reduce((acc, file) => {
+    const prefix = file.fileName.split('-')[0];
+    if (!acc[prefix]) acc[prefix] = { png: null, pdf: null, uploadedAt: file.uploadedAt };
+    acc[prefix][file.type] = file;
+    return acc;
+  }, {});
 
-
-        // 1. Send to MongoDB via backend
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('userId', userId); // ✅ just the string
-
-        try {
-          await axios.post('http://localhost:5000/api/excel/upload', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          });
-        } catch (uploadErr) {
-          console.error('Upload error:', uploadErr);
-          setMessage('Error uploading to backend.');
-          return;
-        }
-
-        // 2. Navigate to parse page
-        navigate('/parse', { state: { data: jsonData } });
-      };
-
-      reader.readAsBinaryString(file);
-    } catch (err) {
-      console.error('Parsing error:', err);
-      setMessage('Error parsing Excel file.');
-    }
-  };
+  const entries = Object.entries(grouped);
 
   return (
-    <div className="upload-page-container">
-      <div className="upload-card">
-        <h2 className="upload-title">Upload and View Excel File</h2>
-        <div className="upload-input">
-          <input type="file" accept=".xls,.xlsx" onChange={handleFileChange} />
-        </div>
-        <button className="upload-btn" onClick={handleUploadAndView}>
-          Upload & View
-        </button>
-        {message && <p style={{ color: 'red', marginTop: '1rem' }}>{message}</p>}
-      </div>
+    <div className="history-container">
+      <h2>📂 Downloads from Server Folder</h2>
+      {entries.length === 0 ? (
+        <p>No downloaded charts found.</p>
+      ) : (
+        <table className="history-table">
+          <thead>
+            <tr>
+              <th>Chart ID</th>
+              <th>Uploaded On</th>
+              <th>Download PNG</th>
+              <th>Download PDF</th>
+            </tr>
+          </thead>
+          <tbody>
+            {entries.map(([chartId, files]) => (
+              <tr key={chartId}>
+                <td>{chartId}</td>
+                <td>{new Date(files.uploadedAt).toLocaleString()}</td>
+                <td>
+                  {files.png ? (
+                    <a
+                      href={`${SERVER_BASE_URL}${files.png.url}`}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <button>Download PNG</button>
+                    </a>
+                  ) : 'N/A'}
+                </td>
+                <td>
+                  {files.pdf ? (
+                    <a
+                      href={`${SERVER_BASE_URL}${files.pdf.url}`}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <button>Download PDF</button>
+                    </a>
+                  ) : 'N/A'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };
 
-export default UploadExcel;
+export default UserHistory;

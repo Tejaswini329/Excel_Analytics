@@ -51,7 +51,7 @@ formData.append('userId', userId); // just the string
 
 
         // 2. Navigate to parse page
-       navigate('/parse', { state: { data: jsonData, fileName: file.name } });
+      navigate('/parse', { state: { data: jsonData, fileName: file.name } });
 
       };
 

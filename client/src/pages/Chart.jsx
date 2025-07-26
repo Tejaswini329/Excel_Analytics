@@ -11,6 +11,9 @@ const Chart = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const chartRef = useRef();
+  const [pngLink, setPngLink] = React.useState('');
+const [pdfLink, setPdfLink] = React.useState('');
+
   const { data, xIndex, yIndex, chartType, labelIndex, fileName } = location.state || {};
 
   if (!data || data.length < 2 || xIndex === null || yIndex === null) {
@@ -131,45 +134,98 @@ const Chart = () => {
         return <p>Unsupported chart type: {chartType}</p>;
     }
   };
+const saveChartHistory = async ({ userId, fileName, chartType, downloadLinkPNG, downloadLinkPDF }) => {
+  try {
+    await axios.post('http://localhost:5000/api/history', {
+      userId,
+      fileName,
+      chartType,
+      downloadLinkPNG,
+      downloadLinkPDF
+    });
+    console.log('✅ Chart history saved!');
+  } catch (error) {
+    console.error('❌ Failed to save chart history:', error);
+  }
+};
 
-  const handleDownload = async (format = 'png') => {
-    if (!chartRef.current) return;
-    const canvas = await html2canvas(chartRef.current, { scale: 2 });
-    const imgData = canvas.toDataURL('image/png');
+  const handleDownload = async (format) => {
+  if (!chartRef.current) return;
 
-    if (format === 'png') {
-      const link = document.createElement('a');
-      link.download = 'chart.png';
-      link.href = imgData;
-      link.click();
-    } else {
-      const pdf = new jsPDF();
-      pdf.addImage(imgData, 'PNG', 10, 10, 190, 110);
-      pdf.save('chart.pdf');
-    }
-  };
+  const canvas = await html2canvas(chartRef.current, { scale: 2 });
+  const imgData = canvas.toDataURL('image/png');
+  const res = await fetch(imgData);
+  const pngBlob = await res.blob();
 
-  const logChartHistory = async () => {
-    try {
-      await axios.post('http://localhost:5000/api/charthistory', {
-        userId: localStorage.getItem('userId'),
-        fileName: fileName || 'Uploaded File',
-        chartType,
-        xAxis: headers[xIndex],
-        yAxis: headers[yIndex],
-        labelColumn: labelIndex !== null ? headers[labelIndex] : '',
-        downloadLinkPNG: '',
-        downloadLinkPDF: ''
-      });
-    } catch (err) {
-      console.error('Error logging chart history:', err);
-    }
-  };
+  let fileBlob;
+  let downloadFileName;
+  let fileField;
 
-  useEffect(() => {
-    logChartHistory();
-  }, []);
+  const pdf = new jsPDF();
+  if (format === 'png') {
+    fileBlob = pngBlob;
+    downloadFileName = 'chart.png';
+    fileField = 'chartPNG';
+  } else {
+    pdf.addImage(imgData, 'PNG', 10, 10, 190, 110);
+    fileBlob = pdf.output('blob');
+    downloadFileName = 'chart.pdf';
+    fileField = 'chartPDF';
+  }
 
+  const formData = new FormData();
+  const userId = localStorage.getItem('userId');
+  formData.append('userId', userId);
+  formData.append('fileName', fileName || 'Uploaded File');
+  formData.append('chartType', chartType);
+  formData.append('xAxis', headers[xIndex]);
+  formData.append('yAxis', headers[yIndex]);
+  formData.append('labelColumn', labelIndex !== null ? headers[labelIndex] : '');
+  formData.append(fileField, fileBlob, downloadFileName);
+
+  try {
+    const response = await axios.post('http://localhost:5000/api/charthistory/upload', formData);
+    const entry = response.data.entry;
+
+    const downloadLink = format === 'png' ? entry.downloadLinkPNG : entry.downloadLinkPDF;
+
+    // Save chart history
+    await saveChartHistory({
+      userId,
+      fileName: fileName || 'Uploaded File',
+      chartType,
+      downloadLinkPNG: format === 'png' ? downloadLink : '',
+      downloadLinkPDF: format === 'pdf' ? downloadLink : ''
+    });
+
+    // Trigger file download
+    const link = document.createElement('a');
+    link.href = `http://localhost:5000${downloadLink}`;
+    link.download = downloadFileName;
+    link.click();
+
+    // Save download link to state
+    if (format === 'png') setPngLink(`http://localhost:5000${downloadLink}`);
+    else setPdfLink(`http://localhost:5000${downloadLink}`);
+
+  } catch (err) {
+    console.error(`❌ Failed to download ${format}:`, err);
+  }
+};
+useEffect(() => {
+  const userId = localStorage.getItem('userId');
+  if (userId && pngLink && pdfLink) {
+    saveChartHistory({
+      userId,
+      fileName: fileName || 'Uploaded File',
+      chartType,
+      downloadLinkPNG: pngLink,
+      downloadLinkPDF: pdfLink
+    });
+  }
+}, [pngLink, pdfLink]);
+
+  
   return (
     <>
       
@@ -188,12 +244,17 @@ const Chart = () => {
           }}
         >
           {renderChart()}
+          
         </div>
+        
 
         <div className="download-buttons">
-          <button onClick={() => handleDownload('png')}>📸 Download PNG</button>
-          <button onClick={() => handleDownload('pdf')}>📄 Download PDF</button>
-        </div>
+  <button onClick={() => handleDownload('png')}>📸 Download PNG</button>
+  <button onClick={() => handleDownload('pdf')}>📄 Download PDF</button>
+</div>
+
+
+
       </div>
     </>
   );

@@ -10,6 +10,7 @@ const excelDataSchema = new mongoose.Schema({
     type: [mongoose.Schema.Types.Mixed],
     required: true
   },
+  fileName: String,
   uploadedAt: {
     type: Date,
     default: Date.now

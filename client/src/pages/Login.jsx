@@ -18,8 +18,9 @@ function Login() {
 
   try {
     const res = await axios.post('http://localhost:5000/api/auth/login', form);
-    localStorage.setItem('userId', res.data.userId); // ✅ Save userId
+    
     localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('userId', res.data.userId); // ✅ Save userId
     navigate('/upload');
   } catch (err) {
     console.error('Login error:', err);

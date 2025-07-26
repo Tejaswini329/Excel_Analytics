@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
+const path = require('path');
 const app = express();
 
 // ✅ MongoDB Connection
@@ -27,14 +27,18 @@ const protectedRoutes = require('./routes/protectedRoutes');
 app.use('/api', protectedRoutes); // Handles routes like /api/dashboard
 
 const uploadExcelRoutes = require('./routes/uploadExcel');
-app.use('/api/excel', uploadExcelRoutes); // ✅ This adds: POST /api/excel/upload
+app.use('/api/excel', uploadExcelRoutes); // ✅ POST /api/excel/upload
 
 const chartRoutes = require('./routes/ChartHistory');
-app.use('/api', chartRoutes); 
+app.use('/api/charthistory', chartRoutes); // ✅ POST /api/charthistory/upload
 
+app.use('/api/history', require('./routes/userHistory')); 
+ // still OK
 
-const uploadhistory = require('./routes/History');
-app.use('/api',uploadhistory);
+const downloadRoutes = require('./routes/downloads');
+app.use('/api/downloads', downloadRoutes); // ✅ mount route
+app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
+
 
 // ✅ Health Check Route
 app.get('/', (req, res) => {

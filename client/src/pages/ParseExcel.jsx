@@ -13,6 +13,7 @@ const ParseExcel = () => {
   const [yIndex, setYIndex] = useState(null);
   const [labelIndex, setLabelIndex] = useState(null);
   const [chartType, setChartType] = useState('bar');
+  const fileName = location.state?.fileName || 'unknown_file.xlsx';
 
   useEffect(() => {
     if (Array.isArray(rawData) && rawData.length > 0) {
@@ -30,7 +31,8 @@ const ParseExcel = () => {
           xIndex,
           yIndex,
           labelIndex,
-          chartType
+          chartType,
+          fileName
         }
       });
     } else {

@@ -5,6 +5,9 @@ const userChartHistorySchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   fileName: String,
   chartType: String,
+  xAxis: String,
+  yAxis: String,
+  labelColumn: String,
   uploadDate: { type: Date, default: Date.now },
   downloadLinkPNG: String,
   downloadLinkPDF: String
