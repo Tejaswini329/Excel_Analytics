@@ -10,15 +10,15 @@
 }
 
 .download-buttons button {
-  background-color: #4B9FE1;
-  color: white;
+  margin-right: 10px;
+  padding: 0.5rem 1rem;
   border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  font-size: 1rem;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
   cursor: pointer;
 }
 
 .download-buttons button:hover {
-  background-color: #357ABD;
+  background-color: #0056b3;
 }

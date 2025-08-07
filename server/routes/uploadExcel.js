@@ -2,13 +2,30 @@ const express = require('express');
 const multer = require('multer');
 const XLSX = require('xlsx');
 const ExcelData = require('../models/ExcelData');
-console.log('ExcelData:', ExcelData);
+const UserChartHistory = require('../models/UserChartHistory');
 const mongoose = require('mongoose');
-
-const UserChartHistory = require('../models/UserChartHistory'); 
+const path = require('path');
+const fs = require('fs');
 
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
+console.log('__dirname:', __dirname);
+const DOWNLOADS_DIR = path.join(__dirname, '..', 'downloads');
+if (!fs.existsSync(DOWNLOADS_DIR)) {
+  fs.mkdirSync(DOWNLOADS_DIR);
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, DOWNLOADS_DIR);
+  },
+  filename: function (req, file, cb) {
+    const timestamp = Date.now();
+    const sanitized = file.originalname.replace(/\s+/g, '_');
+    cb(null, `${timestamp}-${sanitized}`);
+  }
+});
+
+const upload = multer({ storage });
 
 router.post('/upload', upload.single('file'), async (req, res) => {
   const userId = req.body.userId;
@@ -22,10 +39,11 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
+    const filePath = req.file.path;
+    const originalFileName = req.file.filename;
     const chartType = req.body.chartType || 'Unknown';
-    const originalFileName = req.file.originalname;
 
-    const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+    const workbook = XLSX.readFile(filePath);
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
     const parsedData = XLSX.utils.sheet_to_json(worksheet);
@@ -34,7 +52,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'Excel content is empty or invalid' });
     }
 
-    // ✅ Save the Excel data
+    // Save Excel data to Mongo
     const excelEntry = await ExcelData.create({
       userId,
       rows: parsedData,
@@ -42,7 +60,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       fileName: originalFileName
     });
 
-    // ✅ Log chart history
+    // Log in chart history
     await UserChartHistory.create({
       userId,
       fileName: originalFileName,
@@ -51,13 +69,18 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       downloadLinkPDF: ''
     });
 
-    res.status(200).json({ message: 'Uploaded, saved, and chart history logged!', id: excelEntry._id });
+    res.status(200).json({
+      message: 'Uploaded, saved, and chart history logged!',
+      id: excelEntry._id,
+      fileUrl: `/downloads/${originalFileName}`
+    });
 
   } catch (err) {
     console.error('❌ Upload or DB Error:', err);
     res.status(500).json({ error: 'Internal Server Error', details: err.message });
   }
-});
+  console.log('📁 Uploaded file saved at:', req.file.path);
 
+});
 
 module.exports = router;

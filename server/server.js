@@ -5,7 +5,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
-
+const uploadHistoryRouter = require('./routes/uploadHistory');
 // ✅ MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Atlas connected!'))
@@ -20,7 +20,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(bodyParser.json({ limit: '10mb' }));
 
 // ✅ Routes
-const authRoutes = require('./routes/authRoutes');
+const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
 const protectedRoutes = require('./routes/protectedRoutes');
@@ -32,12 +32,15 @@ app.use('/api/excel', uploadExcelRoutes); // ✅ POST /api/excel/upload
 const chartRoutes = require('./routes/ChartHistory');
 app.use('/api/charthistory', chartRoutes); // ✅ POST /api/charthistory/upload
 
-app.use('/api/history', require('./routes/userHistory')); 
+app.use('/api/uploadhistory', uploadHistoryRouter);
+
+
  // still OK
 
 const downloadRoutes = require('./routes/downloads');
 app.use('/api/downloads', downloadRoutes); // ✅ mount route
 app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
+
 
 
 // ✅ Health Check Route

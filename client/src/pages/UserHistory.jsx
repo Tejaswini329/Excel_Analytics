@@ -1,83 +1,101 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './UserHistory.css';
 
-const SERVER_BASE_URL = 'http://localhost:5000';
+const UserHistory = ({ userId: propUserId }) => {
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-const UserHistory = () => {
-  const [downloads, setDownloads] = useState([]);
+  const userId = propUserId || localStorage.getItem('userId');
 
-  useEffect(() => {
-    const fetchDownloads = async () => {
-      try {
-        const res = await axios.get(`${SERVER_BASE_URL}/api/downloads`);
-        setDownloads(res.data);
-      } catch (err) {
-        console.error('Failed to fetch downloads:', err);
+ useEffect(() => {
+  if (!userId) return;
+
+  const fetchHistory = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/charthistory/${userId}`);
+      if (Array.isArray(res.data)) {
+        // Remove incomplete entries and duplicates
+        const filtered = res.data.filter(item =>
+          item.fileName &&
+          item.chartType &&
+          item.downloadLinkPNG &&
+          item.downloadLinkPDF
+        );
+
+        const unique = Array.from(
+          new Map(filtered.map(item => [`${item.fileName}-${item.chartType}`, item])).values()
+        );
+        setHistory(unique);
+      } else {
+        setHistory([]);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching history:', error);
+      setHistory([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchDownloads();
-  }, []);
+  fetchHistory();
+}, [userId]);
 
-  // Group PNG + PDF by file prefix (ID part before dash)
-  const grouped = downloads.reduce((acc, file) => {
-    const prefix = file.fileName.split('-')[0];
-    if (!acc[prefix]) acc[prefix] = { png: null, pdf: null, uploadedAt: file.uploadedAt };
-    acc[prefix][file.type] = file;
-    return acc;
-  }, {});
 
-  const entries = Object.entries(grouped);
+  if (loading) return <p className="loading-text">⏳ Loading...</p>;
+  if (!history.length) return <p className="no-history-text">📭 No chart history available.</p>;
 
   return (
-    <div className="history-container">
-      <h2>📂 Downloads from Server Folder</h2>
-      {entries.length === 0 ? (
-        <p>No downloaded charts found.</p>
-      ) : (
+    <div className="user-history-container">
+      <h2 className="user-history-title">📁 History</h2>
+      <div className="table-wrapper">
         <table className="history-table">
           <thead>
             <tr>
-              <th>Chart ID</th>
-              <th>Uploaded On</th>
-              <th>Download PNG</th>
-              <th>Download PDF</th>
+              <th>🗂 File Name</th>
+              <th>📊 Chart Type</th>
+              <th>🖼️ PNG</th>
+              <th>📄 PDF</th>
             </tr>
           </thead>
           <tbody>
-            {entries.map(([chartId, files]) => (
-              <tr key={chartId}>
-                <td>{chartId}</td>
-                <td>{new Date(files.uploadedAt).toLocaleString()}</td>
+            {history.map((item, index) => (
+              <tr key={index}>
+                <td>{item.fileName}</td>
+                <td>{item.chartType || 'Unknown'}</td>
                 <td>
-                  {files.png ? (
+                  {item.downloadLinkPNG ? (
                     <a
-                      href={`${SERVER_BASE_URL}${files.png.url}`}
-                      download
+                      className="download-button"
+                      href={`http://localhost:5000${item.downloadLinkPNG}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <button>Download PNG</button>
+                      Download PNG
                     </a>
-                  ) : 'N/A'}
+                  ) : (
+                    '—'
+                  )}
                 </td>
                 <td>
-                  {files.pdf ? (
+                  {item.downloadLinkPDF ? (
                     <a
-                      href={`${SERVER_BASE_URL}${files.pdf.url}`}
-                      download
+                      className="download-button"
+                      href={`http://localhost:5000${item.downloadLinkPDF}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <button>Download PDF</button>
+                      Download PDF
                     </a>
-                  ) : 'N/A'}
+                  ) : (
+                    '—'
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      )}
+      </div>
     </div>
   );
 };

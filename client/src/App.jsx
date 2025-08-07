@@ -11,6 +11,9 @@ import ParseExcel from './pages/ParseExcel';
 import WelcomePage from './pages/WelcomePage';
 import Chart from './pages/chart';
 import UserHistory from './pages/UserHistory';
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from './pages/ResetPassword';
+
 
 import './App.css';
 
@@ -67,10 +70,16 @@ function App() {
         <Route path="/" element={<WelcomePage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/upload" element={<UploadExcel />} />
         <Route path="/parse" element={<ParseExcel />} />
          <Route path="/chart" element={<Chart />} />
-         <Route path="/user-history" element={<UserHistory />} />
+         <Route
+  path="/user-history"
+  element={<UserHistory userId={localStorage.getItem('userId')} />}
+/>
+
         <Route path="*" element={<div>404 - Page Not Found</div>} />
       </Routes>
     </div>

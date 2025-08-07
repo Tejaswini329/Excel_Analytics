@@ -51,17 +51,27 @@ function Login() {
           />
         </div>
         <div className="input-group">
-          <FaLock className="input-icon" />
-          <input
-            type="text"
-            name="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
-            required
-            autoComplete="current-password"
-          />
-        </div>
+  <FaLock className="input-icon" />
+  <input
+    type="text"
+    name="password"
+    placeholder="Password"
+    value={form.password}
+    onChange={handleChange}
+    required
+    autoComplete="current-password"
+  />
+</div>
+
+<p
+  className="login-subtitle"
+  style={{ marginTop: "0.5rem", textAlign: "left", width: "100%" }}
+>
+  <a href="/forgot-password">Forgot Password?</a>
+</p>
+
+       
+
         <button type="submit" className="login-btn">
           Login
         </button>

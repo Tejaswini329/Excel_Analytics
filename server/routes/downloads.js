@@ -1,31 +1,49 @@
 const express = require('express');
+const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 
-const router = express.Router();
-const DOWNLOADS_DIR = path.join(__dirname, '..', 'downloads');
+const DOWNLOADS_DIR = path.join(__dirname, '..', 'downloads'); // adjust as needed
 
-router.get('/', (req, res) => {
-  fs.readdir(DOWNLOADS_DIR, (err, files) => {
-    if (err) {
-      console.error('Error reading downloads folder:', err);
-      return res.status(500).json({ error: 'Failed to read downloads folder' });
-    }
+router.get('/', async (req, res) => {
+  const { userId } = req.query;
 
-    const validFiles = files.filter(f => f.endsWith('.png') || f.endsWith('.pdf'));
+  try {
+    const files = await fs.promises.readdir(DOWNLOADS_DIR);
 
-    const downloadList = validFiles.map(file => {
-      const stats = fs.statSync(path.join(DOWNLOADS_DIR, file));
-      return {
-        fileName: file,
-        type: file.endsWith('.png') ? 'png' : 'pdf',
-        uploadedAt: stats.ctime,
-        url: `/downloads/${file}`, // served statically
-      };
-    });
+    const validFiles = files.filter(f =>
+      f.endsWith('.png') || f.endsWith('.pdf') || f.endsWith('.xlsx') || f.endsWith('.xls')
+    );
+
+    const downloadList = validFiles
+      .map(file => {
+        const ext = path.extname(file).toLowerCase();
+        const parts = file.split('-');
+        const prefix = parts[0]; // this should be userId if your filename format is `${userId}-${timestamp}-filename.xlsx`
+
+        if (userId && prefix !== userId) return null;
+
+        const stats = fs.statSync(path.join(DOWNLOADS_DIR, file));
+        let type = '';
+        if (ext === '.png') type = 'png';
+        else if (ext === '.pdf') type = 'pdf';
+        else type = 'excel';
+
+        return {
+          fileName: file,
+          type,
+          uploadedAt: stats.ctime,
+          url: `/downloads/${file}`,
+          userId: prefix,
+        };
+      })
+      .filter(Boolean);
 
     res.json(downloadList);
-  });
+  } catch (err) {
+    console.error('Error reading downloads folder:', err);
+    res.status(500).json({ error: 'Failed to read downloads folder' });
+  }
 });
 
 module.exports = router;

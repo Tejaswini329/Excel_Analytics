@@ -14,6 +14,7 @@ const Chart = () => {
   const [pngLink, setPngLink] = React.useState('');
 const [pdfLink, setPdfLink] = React.useState('');
 
+
   const { data, xIndex, yIndex, chartType, labelIndex, fileName } = location.state || {};
 
   if (!data || data.length < 2 || xIndex === null || yIndex === null) {
@@ -154,76 +155,49 @@ const saveChartHistory = async ({ userId, fileName, chartType, downloadLinkPNG, 
 
   const canvas = await html2canvas(chartRef.current, { scale: 2 });
   const imgData = canvas.toDataURL('image/png');
-  const res = await fetch(imgData);
-  const pngBlob = await res.blob();
-
-  let fileBlob;
-  let downloadFileName;
-  let fileField;
+  const response = await fetch(imgData);
+  const pngBlob = await response.blob();
 
   const pdf = new jsPDF();
-  if (format === 'png') {
-    fileBlob = pngBlob;
-    downloadFileName = 'chart.png';
-    fileField = 'chartPNG';
-  } else {
-    pdf.addImage(imgData, 'PNG', 10, 10, 190, 110);
-    fileBlob = pdf.output('blob');
-    downloadFileName = 'chart.pdf';
-    fileField = 'chartPDF';
-  }
+  pdf.addImage(imgData, 'PNG', 10, 10, 190, 110);
+  const pdfBlob = pdf.output('blob');
 
-  const formData = new FormData();
+  const fileBlob = format === 'png' ? pngBlob : pdfBlob;
+  const fileName = format === 'png' ? 'chart.png' : 'chart.pdf';
+  const fileField = format === 'png' ? 'chartPNG' : 'chartPDF';
+
   const userId = localStorage.getItem('userId');
+  const formData = new FormData();
   formData.append('userId', userId);
   formData.append('fileName', fileName || 'Uploaded File');
   formData.append('chartType', chartType);
   formData.append('xAxis', headers[xIndex]);
   formData.append('yAxis', headers[yIndex]);
   formData.append('labelColumn', labelIndex !== null ? headers[labelIndex] : '');
-  formData.append(fileField, fileBlob, downloadFileName);
+  formData.append(fileField, fileBlob, fileName);
 
   try {
-    const response = await axios.post('http://localhost:5000/api/charthistory/upload', formData);
-    const entry = response.data.entry;
+    const res = await axios.post('http://localhost:5000/api/charthistory/uploadcharts', formData);
+    const entry = res.data.entry;
 
-    const downloadLink = format === 'png' ? entry.downloadLinkPNG : entry.downloadLinkPDF;
+    const downloadLink = `http://localhost:5000${
+      format === 'png' ? entry.downloadLinkPNG : entry.downloadLinkPDF
+    }`;
 
-    // Save chart history
-    await saveChartHistory({
-      userId,
-      fileName: fileName || 'Uploaded File',
-      chartType,
-      downloadLinkPNG: format === 'png' ? downloadLink : '',
-      downloadLinkPDF: format === 'pdf' ? downloadLink : ''
-    });
-
-    // Trigger file download
     const link = document.createElement('a');
-    link.href = `http://localhost:5000${downloadLink}`;
-    link.download = downloadFileName;
+    link.href = downloadLink;
+    link.download = fileName;
     link.click();
 
-    // Save download link to state
-    if (format === 'png') setPngLink(`http://localhost:5000${downloadLink}`);
-    else setPdfLink(`http://localhost:5000${downloadLink}`);
+    if (format === 'png') setPngLink(downloadLink);
+    else setPdfLink(downloadLink);
 
+    console.log(`✅ ${format.toUpperCase()} chart uploaded and downloaded`);
   } catch (err) {
-    console.error(`❌ Failed to download ${format}:`, err);
+    console.error(`❌ Failed to upload ${format.toUpperCase()} chart:`, err);
   }
 };
-useEffect(() => {
-  const userId = localStorage.getItem('userId');
-  if (userId && pngLink && pdfLink) {
-    saveChartHistory({
-      userId,
-      fileName: fileName || 'Uploaded File',
-      chartType,
-      downloadLinkPNG: pngLink,
-      downloadLinkPDF: pdfLink
-    });
-  }
-}, [pngLink, pdfLink]);
+
 
   
   return (
@@ -248,10 +222,11 @@ useEffect(() => {
         </div>
         
 
-        <div className="download-buttons">
+       <div className="download-buttons">
   <button onClick={() => handleDownload('png')}>📸 Download PNG</button>
   <button onClick={() => handleDownload('pdf')}>📄 Download PDF</button>
 </div>
+
 
 
 
