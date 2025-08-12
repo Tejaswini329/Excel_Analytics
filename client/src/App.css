@@ -117,3 +117,26 @@ tr:hover {
 td:first-child {
   font-weight: bold;
 }
+/* Smaller logout button style */
+.logout-btn {
+  margin-left: 20px;
+  padding: 4px 6px;       /* smaller left-right padding */
+  max-width: 80px;        /* optional fixed max width */
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;    /* prevent button text wrapping */
+  text-align: center;
+}
+
+.logout-btn:hover,
+.logout-btn:focus {
+  background-color: #a71d2a;
+  outline: none;
+}
+

@@ -47,6 +47,16 @@ app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
 app.get('/', (req, res) => {
   res.send('🚀 Server is running and MongoDB is connected!');
 });
+const __dirname1 = path.resolve();
+
+// Serve frontend in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname1, "/client/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname1, "client", "dist", "index.html"));
+  });
+}
 
 // ✅ Start Server
 const PORT = process.env.PORT || 5000;

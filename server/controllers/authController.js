@@ -89,6 +89,7 @@ const loginUser = async (req, res) => {
 };
 
 // POST /api/auth/forgot-password
+// POST /api/auth/forgot-password
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -96,19 +97,23 @@ const forgotPassword = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // ✅ Generate token
-    const resetToken = crypto.randomBytes(32).toString("hex"); // RAW token
-const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex"); // HASHED token
+    // Generate raw token
+    const rawToken = crypto.randomBytes(32).toString("hex");
 
-user.resetToken = hashedToken;
-user.resetTokenExpiry = Date.now() + 3600000; // 1 hour
-await user.save();
-console.log("🔐 Saved hashed token:", hashedToken);
+    // Hash token for storage
+    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+    // Store hashed token + expiry
+    user.resetToken = hashedToken;
+    user.resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hr
+    await user.save();
+
+    console.log("🔐 Hashed token saved in DB:", hashedToken);
+
+    // ✅ Send raw token in email link
+    const resetUrl = `http://localhost:5173/reset-password/${rawToken}`;
 
 
-    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
-    
-    // ✅ Send email
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -132,10 +137,11 @@ console.log("🔐 Saved hashed token:", hashedToken);
     res.status(200).json({ message: "Reset link sent! Please check your email." });
 
   } catch (err) {
-    console.error("❌ Email sending failed:", err);
+    console.error("❌ Forgot password error:", err);
     res.status(500).json({ error: "Failed to send reset email." });
   }
 };
+
 
 // POST /api/auth/verify-otp
 const verifyOtp = async (req, res) => {
@@ -165,37 +171,40 @@ const verifyOtp = async (req, res) => {
 
 // POST /api/auth/reset-password/:token
 const resetPassword = async (req, res) => {
-  const { token } = req.params;
+  const { token } = req.params; // raw token from URL
   const { password } = req.body;
 
   try {
     console.log("👉 Raw token from URL:", token);
-const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-console.log("🔐 Hashed token generated:", hashedToken);
 
-const user = await User.findOne({
-  resetToken: hashedToken,
-  resetTokenExpiry: { $gt: Date.now() }
-});
+    // ✅ Hash the token before DB lookup
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
-if (!user) {
-  console.log("❌ Token not found or expired");
-  return res.status(400).json({ error: 'Invalid or expired token' });
-}
+    const user = await User.findOne({
+      resetToken: hashedToken,
+      resetTokenExpiry: { $gt: new Date() }
+    });
 
+    if (!user) {
+      console.log("❌ Token not found or expired");
+      return res.status(400).json({ error: 'Invalid or expired token' });
+    }
+
+    // ✅ Update password
     user.password = await bcrypt.hash(password, 10);
     user.resetToken = undefined;
     user.resetTokenExpiry = undefined;
     await user.save();
 
     res.status(200).json({ message: 'Password has been reset successfully.' });
+
   } catch (err) {
+    console.error("❌ Error resetting password:", err);
     res.status(500).json({ error: 'Server error during password reset' });
   }
-  console.log("👉 Raw token from URL:", token);
-console.log("🔐 Hashed token generated:", hashedToken);
-
 };
+
+
 
 module.exports = {
   registerUser,

@@ -8,39 +8,47 @@ const UserHistory = ({ userId: propUserId }) => {
 
   const userId = propUserId || localStorage.getItem('userId');
 
- useEffect(() => {
-  if (!userId) return;
+  useEffect(() => {
+    if (!userId) return;
 
-  const fetchHistory = async () => {
-    try {
-      const res = await axios.get(`http://localhost:5000/api/charthistory/${userId}`);
-      if (Array.isArray(res.data)) {
-        // Remove incomplete entries and duplicates
-        const filtered = res.data.filter(item =>
-          item.fileName &&
-          item.chartType &&
-          item.downloadLinkPNG &&
-          item.downloadLinkPDF
-        );
+    const fetchHistory = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/charthistory/${userId}`);
+        if (Array.isArray(res.data)) {
+          // Remove incomplete entries and duplicates
+          const filtered = res.data.filter(item =>
+            item.fileName &&
+            item.chartType &&
+            item.downloadLinkPNG &&
+            item.downloadLinkPDF
+          );
 
-        const unique = Array.from(
-          new Map(filtered.map(item => [`${item.fileName}-${item.chartType}`, item])).values()
-        );
-        setHistory(unique);
-      } else {
+          const unique = Array.from(
+            new Map(filtered.map(item => [`${item.fileName}-${item.chartType}`, item])).values()
+          );
+          setHistory(unique);
+        } else {
+          setHistory([]);
+        }
+      } catch (error) {
+        console.error('Error fetching history:', error);
         setHistory([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error fetching history:', error);
-      setHistory([]);
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    fetchHistory();
+  }, [userId]);
+
+  const handleDownload = (url, fileName) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
-
-  fetchHistory();
-}, [userId]);
-
 
   if (loading) return <p className="loading-text">⏳ Loading...</p>;
   if (!history.length) return <p className="no-history-text">📭 No chart history available.</p>;
@@ -65,28 +73,24 @@ const UserHistory = ({ userId: propUserId }) => {
                 <td>{item.chartType || 'Unknown'}</td>
                 <td>
                   {item.downloadLinkPNG ? (
-                    <a
+                    <button
                       className="download-button"
-                      href={`http://localhost:5000${item.downloadLinkPNG}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      onClick={() => handleDownload(`http://localhost:5000${item.downloadLinkPNG}`, item.fileName || 'chart.png')}
                     >
                       Download PNG
-                    </a>
+                    </button>
                   ) : (
                     '—'
                   )}
                 </td>
                 <td>
                   {item.downloadLinkPDF ? (
-                    <a
+                    <button
                       className="download-button"
-                      href={`http://localhost:5000${item.downloadLinkPDF}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      onClick={() => handleDownload(`http://localhost:5000${item.downloadLinkPDF}`, item.fileName || 'chart.pdf')}
                     >
                       Download PDF
-                    </a>
+                    </button>
                   ) : (
                     '—'
                   )}

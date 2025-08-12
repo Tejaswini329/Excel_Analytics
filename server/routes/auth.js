@@ -12,7 +12,8 @@ const {
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/forgot-password', forgotPassword);
-router.post('/reset-password/:token', resetPassword);
+router.post('/reset-password/:token', resetPassword); 
+
 
 // ✅ OTP verification route
 router.post('/verify-otp', verifyOtp);
