@@ -1,0 +1,88 @@
+/* AdminLogin.css */
+
+.login-bg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f8f9fa;
+}
+
+.login-card {
+  background: #fff;
+  padding: 2rem;
+  width: 350px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.login-card h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.login-card button[type="submit"] {
+  width: 100%;
+  padding: 0.8rem;
+  background: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.login-card button[type="submit"]:hover {
+  background: #0056b3;
+}
+
+/* Forgot password link */
+.forgot-password {
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.forgot-password button {
+  background: none;
+  border: none;
+  color: #007BFF;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+.forgot-password button:hover {
+  color: #0056b3;
+}
+
+/* Register link */
+.register-link {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.register-link button {
+  background: none;
+  border: none;
+  color: #007BFF;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+.register-link button:hover {
+  color: #0056b3;
+}

@@ -1,7 +1,8 @@
+// middleware/auth.js
 const jwt = require('jsonwebtoken');
 
 module.exports = function (req, res, next) {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const token = req.header('Authorization')?.replace('Bearer ', '') || req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ message: 'No token, authorization denied' });
 
   try {
