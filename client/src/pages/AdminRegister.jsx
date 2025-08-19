@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import "../components/Login.css"; // adjust path if your CSS is elsewhere
+import "../pages/login.css";
 
 export default function AdminRegister() {
   const [step, setStep] = useState(1); // 1=email, 2=otp, 3=password

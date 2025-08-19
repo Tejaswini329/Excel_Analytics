@@ -1,4 +1,3 @@
-// models/User.js
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
@@ -11,6 +10,9 @@ const UserSchema = new mongoose.Schema({
   otpExpiry: Date,
   resetToken: String,
   resetTokenExpiry: Date,
-});
+
+  // ✅ Added field for enabling/disabling users
+  isActive: { type: Boolean, default: true }
+}, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);

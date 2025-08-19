@@ -197,7 +197,7 @@ const Chart = () => {
     // Prepare form data
     const userId = localStorage.getItem('userId');
     const formData = new FormData();
-    formData.append('userId', userId);
+    formData.append('userId', localStorage.getItem('userId')); 
     formData.append('fileName', fileName || 'Uploaded File');
     formData.append('chartType', selectedType);
     formData.append('xAxis', headers[xIndex]);

@@ -4,10 +4,10 @@ const express = require('express');
 const router = express.Router();
 const UserChartHistory = require('../models/UserChartHistory');
 
-// ✅ Storage setup
+// ✅ Storage setup (fixed typo: diskStorage)
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'downloads/'); // Ensure this folder exists
+    cb(null, 'downloads/'); // make sure this folder exists
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -17,7 +17,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// ✅ Upload route — require BOTH files
+/**
+ * ================================================
+ *  POST /api/charthistory/uploadcharts
+ *  → Upload chart PNG + PDF, save metadata to MongoDB
+ * ================================================
+ */
 router.post(
   '/uploadcharts',
   upload.fields([
@@ -26,14 +31,14 @@ router.post(
   ]),
   async (req, res) => {
     try {
-      console.log('Files received:', req.files);
+      console.log('📂 Files received:', req.files);
 
       const { userId, fileName, chartType, xAxis, yAxis, labelColumn } = req.body;
       const pngFile = req.files?.chartPNG?.[0];
       const pdfFile = req.files?.chartPDF?.[0];
 
       if (!chartType || !fileName || !pngFile || !pdfFile) {
-        return res.status(400).json({ error: 'PNG and PDF files are required' });
+        return res.status(400).json({ error: 'PNG, PDF, fileName, and chartType are required' });
       }
 
       const entry = await UserChartHistory.create({
@@ -55,5 +60,27 @@ router.post(
     }
   }
 );
+
+/**
+ * ================================================
+ *  GET /api/charthistory/:userId
+ *  → Fetch history for a specific user
+ * ================================================
+ */
+router.get('/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const history = await UserChartHistory.find({ userId }).sort({ uploadDate: -1 });
+
+    if (!history.length) {
+      return res.json([]); // no history yet
+    }
+
+    res.json(history);
+  } catch (err) {
+    console.error('❌ Fetch history error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch chart history' });
+  }
+});
 
 module.exports = router;

@@ -18,9 +18,18 @@ function Login() {
 
   try {
     const res = await axios.post('http://localhost:5000/api/auth/login', form);
-    
+
+    // Check if user is active
+    if (!res.data.isActive) {
+      alert("Your account has been disabled. Please contact admin.");
+      return;
+    }
+
+    // Save login info only if user is active
     localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('userId', res.data.userId); // ✅ Save userId
+    localStorage.setItem('userId', res.data.userId);
+    localStorage.setItem('isAdmin', res.data.isAdmin || false);
+
     navigate('/upload');
   } catch (err) {
     console.error('Login error:', err);

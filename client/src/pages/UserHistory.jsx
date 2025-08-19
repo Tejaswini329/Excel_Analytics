@@ -15,18 +15,14 @@ const UserHistory = ({ userId: propUserId }) => {
       try {
         const res = await axios.get(`http://localhost:5000/api/charthistory/${userId}`);
         if (Array.isArray(res.data)) {
-          // Remove incomplete entries and duplicates
+          // Keep all duplicates, only remove incomplete entries
           const filtered = res.data.filter(item =>
             item.fileName &&
             item.chartType &&
             item.downloadLinkPNG &&
             item.downloadLinkPDF
           );
-
-          const unique = Array.from(
-            new Map(filtered.map(item => [`${item.fileName}-${item.chartType}`, item])).values()
-          );
-          setHistory(unique);
+          setHistory(filtered);
         } else {
           setHistory([]);
         }
@@ -51,7 +47,7 @@ const UserHistory = ({ userId: propUserId }) => {
   };
 
   if (loading) return <p className="loading-text">⏳ Loading...</p>;
-  if (!history.length) return <p className="no-history-text">📭 No chart history available.</p>;
+  if (!history.length) return <p className="no-history-text">📭 No history available.</p>;
 
   return (
     <div className="user-history-container">
@@ -75,7 +71,12 @@ const UserHistory = ({ userId: propUserId }) => {
                   {item.downloadLinkPNG ? (
                     <button
                       className="download-button"
-                      onClick={() => handleDownload(`http://localhost:5000${item.downloadLinkPNG}`, item.fileName || 'chart.png')}
+                      onClick={() =>
+                        handleDownload(
+                          `http://localhost:5000${item.downloadLinkPNG}`,
+                          item.fileName || 'chart.png'
+                        )
+                      }
                     >
                       Download PNG
                     </button>
@@ -87,7 +88,12 @@ const UserHistory = ({ userId: propUserId }) => {
                   {item.downloadLinkPDF ? (
                     <button
                       className="download-button"
-                      onClick={() => handleDownload(`http://localhost:5000${item.downloadLinkPDF}`, item.fileName || 'chart.pdf')}
+                      onClick={() =>
+                        handleDownload(
+                          `http://localhost:5000${item.downloadLinkPDF}`,
+                          item.fileName || 'chart.pdf'
+                        )
+                      }
                     >
                       Download PDF
                     </button>

@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
 const uploadHistoryRouter = require('./routes/uploadHistory');
+
 // ✅ MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Atlas connected!'))
@@ -34,19 +35,22 @@ app.use('/api/charthistory', chartRoutes); // ✅ POST /api/charthistory/upload
 
 app.use('/api/uploadhistory', uploadHistoryRouter);
 
+// ❌ Old ESM import
+// import adminRoutes from "./routes/admin.js";
 
- // still OK
+// ✅ Fix: use require
+const adminRoutes = require('./routes/admin');
+app.use('/api/admin', adminRoutes);
 
 const downloadRoutes = require('./routes/downloads');
 app.use('/api/downloads', downloadRoutes); // ✅ mount route
 app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
 
-
-
 // ✅ Health Check Route
 app.get('/', (req, res) => {
   res.send('🚀 Server is running and MongoDB is connected!');
 });
+
 const __dirname1 = path.resolve();
 
 // Serve frontend in production
