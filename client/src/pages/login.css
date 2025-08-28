@@ -1,0 +1,172 @@
+/* Global Background */
+.login-bg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #f1f4f8, #dde5ed);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card Container */
+.login-card {
+  background-color: #fff;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Logo Circle */
+.logo-circle {
+  width: 60px;
+  height: 60px;
+  background-color: #0078d7;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+}
+
+/* Titles */
+.login-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.login-subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.login-subtitle a {
+  color: #0078d7;
+  text-decoration: none;
+}
+
+/* Input Groups (Updated for perfect icon alignment) */
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fafafa;
+  margin-bottom: 20px;
+}
+
+.input-group .input-icon {
+  font-size: 16px;
+  color: #888;
+  flex-shrink: 0;
+}
+
+.input-group input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 12px 0;
+  font-size: 14px;
+  outline: none;
+}
+
+/* Error Text */
+.error-text {
+  background-color: #fdecea;
+  color: #d93025;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* Button */
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #0078d7;
+  color: white;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #005ea2;
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+}
+
+.divider span {
+  flex: 1;
+  text-align: center;
+  position: relative;
+  font-size: 12px;
+  color: #999;
+}
+
+.divider span::before,
+.divider span::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background-color: #ccc;
+}
+
+.divider span::before {
+  left: -50%;
+}
+
+.divider span::after {
+  right: -50%;
+}
+
+/* Social Icons Row */
+.social-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.social-btn {
+  width: 32%;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f0f2f5;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.social-btn:hover {
+  transform: scale(1.05);
+}
+
+.apple {
+  background-color: #000;
+  color: #fff;
+}
+
+.google {
+  background-color: #4285f4;
+  color: #fff;
+}
+
+.x {
+  background-color: #888;
+  color: #fff;
+}

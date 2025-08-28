@@ -1,0 +1,24 @@
+.chart-page {
+  padding: 2rem;
+}
+
+.download-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.download-buttons button {
+  margin-right: 10px;
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.download-buttons button:hover {
+  background-color: #0056b3;
+}
