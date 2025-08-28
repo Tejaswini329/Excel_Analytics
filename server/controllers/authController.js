@@ -114,7 +114,7 @@ const forgotPassword = async (req, res) => {
     user.resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
     await user.save();
 
-    const resetUrl = `http://localhost:5173/reset-password/${rawToken}`;
+    const resetUrl = `https://web-development-project-gxnx.onrender.com/reset-password/${rawToken}`;
     const transporter = getTransporter();
     await transporter.sendMail({
       from: `"Support" <${process.env.EMAIL_USER}>`,
