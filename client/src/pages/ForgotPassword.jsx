@@ -17,7 +17,7 @@ function ForgotPassword() {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/forgot-password", { email });
+      const res = await axios.post("https://web-development-project-gxnx.onrender.com/api/auth/forgot-password", { email });
       setMessage(res.data.message);
     } catch (err) {
       console.error("Forgot password error:", err);

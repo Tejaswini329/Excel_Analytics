@@ -13,7 +13,7 @@ const UserHistory = ({ userId: propUserId }) => {
 
     const fetchHistory = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/charthistory/${userId}`);
+        const res = await axios.get(`https://web-development-project-gxnx.onrender.com/api/charthistory/${userId}`);
         if (Array.isArray(res.data)) {
           // Keep all duplicates, only remove incomplete entries
           const filtered = res.data.filter(item =>
@@ -73,7 +73,7 @@ const UserHistory = ({ userId: propUserId }) => {
                       className="download-button"
                       onClick={() =>
                         handleDownload(
-                          `http://localhost:5000${item.downloadLinkPNG}`,
+                          `https://web-development-project-gxnx.onrender.com${item.downloadLinkPNG}`,
                           item.fileName || 'chart.png'
                         )
                       }
@@ -90,7 +90,7 @@ const UserHistory = ({ userId: propUserId }) => {
                       className="download-button"
                       onClick={() =>
                         handleDownload(
-                          `http://localhost:5000${item.downloadLinkPDF}`,
+                          `https://web-development-project-gxnx.onrender.com${item.downloadLinkPDF}`,
                           item.fileName || 'chart.pdf'
                         )
                       }

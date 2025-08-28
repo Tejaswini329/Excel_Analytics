@@ -5,7 +5,7 @@ const UserChartHistory = require("../models/UserChartHistory");
 const router = express.Router();
 
 // 📊 Get analytics
-router.get("/analytics", async (req, res) => {
+router.get('/analytics', async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
     const totalCharts = await UserChartHistory.countDocuments();
@@ -47,7 +47,7 @@ router.get("/analytics", async (req, res) => {
 });
 
 // 👥 Get all users with chart counts
-router.get("/users", async (req, res) => {
+router.get('/users', async (req, res) => {
   try {
     const users = await User.find().lean();
 
@@ -69,7 +69,7 @@ router.get("/users", async (req, res) => {
 });
 
 // 🔄 Toggle user enable/disable
-router.patch("/users/:id/toggle", async (req, res) => {
+router.patch('/users/:id/toggle', async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ error: "User not found" });

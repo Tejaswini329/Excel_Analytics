@@ -34,7 +34,7 @@ function Register() {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", {
+      const res = await axios.post("https://web-development-project-gxnx.onrender.com/api/auth/register", {
         username: form.username,
         email: form.email,
         password: form.password,
@@ -55,7 +55,7 @@ function Register() {
     setError("");
 
     try {
-      await axios.post("http://localhost:5000/api/auth/verify-otp", {
+      await axios.post("https://web-development-project-gxnx.onrender.com/api/auth/verify-otp", {
         email: form.email,
         otp: otp,
         tempUserId,

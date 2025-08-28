@@ -22,7 +22,7 @@ export default function AdminRegister() {
     setError("");
     if (!email) return setError("Email is required");
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/admin-register-email", { email, username });
+      const res = await axios.post("https://web-development-project-gxnx.onrender.com/api/auth/admin-register-email", { email, username });
       setTempId(res.data.tempId);
       setStep(2);
       alert("OTP sent to your email. It expires in 3 minutes.");
@@ -38,7 +38,7 @@ export default function AdminRegister() {
     setError("");
     if (!otp) return setError("Enter the OTP");
     try {
-      await axios.post("http://localhost:5000/api/auth/admin-verify-otp", { tempId, email, otp });
+      await axios.post("https://web-development-project-gxnx.onrender.com/api/auth/admin-verify-otp", { tempId, email, otp });
       setStep(3);
       alert("OTP verified — now set your password.");
     } catch (err) {
@@ -54,7 +54,7 @@ export default function AdminRegister() {
     if (!password || !confirmPassword) return setError("Enter and confirm password");
     if (password !== confirmPassword) return setError("Passwords do not match");
     try {
-      await axios.post("http://localhost:5000/api/auth/admin-complete-register", {
+      await axios.post("https://web-development-project-gxnx.onrender.com/api/auth/admin-complete-register", {
         tempId,
         email,
         username,
@@ -143,7 +143,7 @@ export default function AdminRegister() {
                   setError("");
                   try {
                     // resend by calling sendOtp again
-                    const res = await axios.post("http://localhost:5000/api/auth/admin-register-email", { email, username });
+                    const res = await axios.post("https://web-development-project-gxnx.onrender.com/api/auth/admin-register-email", { email, username });
                     setTempId(res.data.tempId);
                     alert("OTP resent to your email.");
                   } catch (err) {

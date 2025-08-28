@@ -206,7 +206,7 @@ const Chart = () => {
     formData.append('chartPNG', pngBlob, 'chart.png');
     formData.append('chartPDF', pdfBlob, 'chart.pdf');
 
-    const res = await axios.post('http://localhost:5000/api/charthistory/uploadcharts', formData, {
+    const res = await axios.post('https://web-development-project-gxnx.onrender.com/api/charthistory/uploadcharts', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
 
@@ -214,8 +214,8 @@ const Chart = () => {
 
     // Auto-download
     for (const [link, name] of [
-      [`http://localhost:5000${entry.downloadLinkPNG}`, 'chart.png'],
-      [`http://localhost:5000${entry.downloadLinkPDF}`, 'chart.pdf']
+      [`https://web-development-project-gxnx.onrender.com${entry.downloadLinkPNG}`, 'chart.png'],
+      [`https://web-development-project-gxnx.onrender.com${entry.downloadLinkPDF}`, 'chart.pdf']
     ]) {
       const a = document.createElement('a');
       a.href = link;

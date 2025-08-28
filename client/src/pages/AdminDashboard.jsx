@@ -35,7 +35,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/admin/analytics");
+        const res = await axios.get("https://web-development-project-gxnx.onrender.com/api/admin/analytics");
         const fetched = res.data;
 
         const formattedUploads = (fetched.dailyUploads || [])
@@ -66,7 +66,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/admin/users");
+        const res = await axios.get("https://web-development-project-gxnx.onrender.com/api/admin/users");
         setUsers(res.data);
       } catch (err) {
         console.error("Error fetching users:", err);
@@ -79,7 +79,7 @@ const AdminDashboard = () => {
   const toggleUser = async (userId) => {
     try {
       const res = await axios.patch(
-        `http://localhost:5000/api/admin/users/${userId}/toggle`
+        `https://web-development-project-gxnx.onrender.com/api/admin/users/${userId}/toggle`
       );
       const updatedUser = res.data;
       setUsers(users.map((u) => (u._id === updatedUser._id ? updatedUser : u)));
