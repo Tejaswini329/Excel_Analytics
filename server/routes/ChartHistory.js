@@ -23,8 +23,7 @@ const upload = multer({ storage });
  *  → Upload chart PNG + PDF, save metadata to MongoDB
  * ================================================
  */
-router.post(
-  '/uploadcharts',
+router.post( '/uploadcharts',
   upload.fields([
     { name: 'chartPNG', maxCount: 1 },
     { name: 'chartPDF', maxCount: 1 }
