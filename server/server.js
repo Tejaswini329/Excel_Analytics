@@ -19,7 +19,7 @@ mongoose.connect(process.env.MONGO_URI)
 // Middleware
 // =========================
 app.use(cors({
-  origin: 'https://web-development-project-gxnx.onrender.com',
+  origin: 'https://excelalalytics.netlify.app',
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
