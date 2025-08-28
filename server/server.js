@@ -14,39 +14,49 @@ mongoose.connect(process.env.MONGO_URI)
 
 // ✅ Middleware
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true
 }));
+
+
 app.use(express.json({ limit: '10mb' }));
 app.use(bodyParser.json({ limit: '10mb' }));
 
 // ✅ Routes
+console.log("Loading auth routes...");
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
+console.log("Loading protect routes...");
 const protectedRoutes = require('./routes/protectedRoutes');
 app.use('/api', protectedRoutes); // Handles routes like /api/dashboard
 
+console.log("Loading excel routes...");
 const uploadExcelRoutes = require('./routes/uploadExcel');
 app.use('/api/excel', uploadExcelRoutes); // ✅ POST /api/excel/upload
 
+console.log("Loading chart..");
 const chartRoutes = require('./routes/ChartHistory');
 app.use('/api/charthistory', chartRoutes); // ✅ POST /api/charthistory/upload
 
+console.log("Loading upload routes...");
 app.use('/api/uploadhistory', uploadHistoryRouter);
 
 // ❌ Old ESM import
 // import adminRoutes from "./routes/admin.js";
 
 // ✅ Fix: use require
+console.log("Loading admin routes...");
 const adminRoutes = require('./routes/admin');
 app.use('/api/admin', adminRoutes);
 
+console.log("Loading download routes...");
 const downloadRoutes = require('./routes/downloads');
 app.use('/api/downloads', downloadRoutes); // ✅ mount route
 app.use('/downloads', express.static(path.join(__dirname, 'downloads')));
 
 // ✅ Health Check Route
+console.log("Loading all routes...");
 app.get('/', (req, res) => {
   res.send('🚀 Server is running and MongoDB is connected!');
 });
