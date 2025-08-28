@@ -5,7 +5,7 @@ import {
   FaLock,
   FaUser,
 } from "react-icons/fa";
-import "./Login.css";
+import "./login.css";
 import { useNavigate } from "react-router-dom";
 
 function Register() {
