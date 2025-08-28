@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaApple, FaGoogle, FaTimes, FaEnvelope, FaLock } from "react-icons/fa";
-import "./Login.css";
+import "./login.css";
 import axios from 'axios';
 
 function Login() {

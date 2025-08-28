@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { FaEnvelope } from "react-icons/fa";
-import "./Login.css"; // Reuse the same styles
+import "./login.css"; // Reuse the same styles
 import { useNavigate } from "react-router-dom";
 
 function ForgotPassword() {
