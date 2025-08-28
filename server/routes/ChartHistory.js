@@ -61,12 +61,7 @@ router.post(
   }
 );
 
-/**
- * ================================================
- *  GET /api/charthistory/:userId
- *  → Fetch history for a specific user
- * ================================================
- */
+
 router.get('/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
